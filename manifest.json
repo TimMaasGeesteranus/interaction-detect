@@ -1,0 +1,17 @@
+{
+  "name": "interaction-detect",
+  "version": "1.0",
+  "description": "Build an Basic Extension!",
+  "permissions": [
+    "activeTab"
+  ],
+  "browser_action": {
+    "default_popup": "user_interface/html/popup.html",
+    "default_icon": { //"Designed by Alvaro_cabrera / Freepik"
+      "16": "img/inspect16.png",
+      "32": "img/inspect32.png",
+      "64": "img/inspect64.png"
+    }
+  },
+  "manifest_version": 2
+}

@@ -1,0 +1,26 @@
+.nav-container {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.nav-item {
+    background-color: #354172;
+    border-left: 1px solid rgba(0, 0, 0, 0.8);
+    border-right: 1px solid rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background-color: #576d96;
+}
+
+.nav-item:first-child {
+    border-left: none;
+}
+
+.nav-item:last-child {
+    border-right: none;
+}
