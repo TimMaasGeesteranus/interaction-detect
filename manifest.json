@@ -1,9 +1,16 @@
 {
   "name": "interaction-detect",
   "version": "1.0",
-  "description": "Build an Basic Extension!",
+  "description": "Detect session replay scripts",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "webNavigation",
+    "storage",
+    "tabs",
+    "contextMenus"
   ],
   "browser_action": {
     "default_popup": "user_interface/html/popup.html",
@@ -13,5 +20,28 @@
       "64": "img/inspect64.png"
     }
   },
-  "manifest_version": 2
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "user_interface/scripts/content/eventListeners.js",
+        "user_interface/scripts/content/injectScript.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "background": {
+    "scripts": [
+      "user_interface/scripts/background/messageListener.js",
+      "user_interface/scripts/background/network.js"
+    ],
+    "type": "module",
+    "persistent": false
+  },
+  "manifest_version": 2,
+  "web_accessible_resources": [
+    "user_interface/scripts/page/eventDetection.js"
+  ]
 }
