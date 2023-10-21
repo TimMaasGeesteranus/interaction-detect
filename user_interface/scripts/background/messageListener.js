@@ -1,28 +1,16 @@
 browser.runtime.onMessage.addListener(receiveMessage);
 
-let totalCount = 0;
-let trackerCount = 0;
-let fsCount = 0;
-
 function receiveMessage(message, sender, sendResponse) {
+    console.log("message received");
+
+    const content = message["content"];
+
     switch (message["type"]) {
-        case "input":
-            browser.browserAction.setBadgeText({ text: message["content"] });
+        case "setBadgeText":
+            browser.browserAction.setBadgeText({ text: content });
             break;
-        case "getCounters":
-            sendResponse({"total": totalCount, "tracker": trackerCount, "fs": fsCount});
+        case "listenerIntercepted":
+            browser.browserAction.setBadgeText({ text: content });
             break;
     }
-}
-
-window.incrementTotalCount = function (){
-    totalCount++;
-}
-
-window.incrementTrackerCount = function (){
-    trackerCount++;
-}
-
-window.incrementFsCount = function (){
-    fsCount++;
 }

@@ -1,6 +1,6 @@
 const MAX_NUM_CALLS_TO_INTERCEPT = 2;
 
-interceptListeners();
+console.log(interceptListeners());
 
 function interceptListeners() {
     const elementType = EventTarget;
@@ -27,13 +27,20 @@ function interceptListeners() {
                     return fn.apply(this, args);;
                 }
 
-                // Put own logic here
-                console.log(`addEventListener of type ${type} was fired`);
+                // Send message that listener was intercepted
+                sendMessageToContentScript(type);               
+
                 // And execute original code
                 return fn.apply(this, args);
             }, ...rest);
         }
     });
+}
+
+function sendMessageToContentScript(message){
+    document.dispatchEvent(
+        new CustomEvent("listenerIntercepted", {detail: message})
+    )
 }
 
 

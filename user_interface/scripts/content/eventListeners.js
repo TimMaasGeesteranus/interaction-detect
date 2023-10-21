@@ -1,17 +1,13 @@
-let timer;
-
-document.addEventListener('keypresss', (event) => {
-    if (event.target.localName == "input") {
-        browser.runtime.sendMessage({ type: "input", content: event.key });
-    }
-});
-
 document.addEventListener('mousemove', (event) => {
-    browser.runtime.sendMessage({ type: "input", content: "yes" });
-    clearTimeout(timer);
-    timer = setTimeout(handleMouseStoppedMoving, 100);
+    browser.runtime.sendMessage({
+        type: "setBadgeText",
+        content: "M"
+    });
 });
 
-function handleMouseStoppedMoving() {
-    browser.runtime.sendMessage({ type: "input", content: "no" })
-}
+document.addEventListener("listenerIntercepted", (event) => {
+    browser.runtime.sendMessage({
+        type: "listenerIntercepted",
+        content: event.detail
+    })
+});

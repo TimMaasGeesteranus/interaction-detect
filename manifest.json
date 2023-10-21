@@ -34,8 +34,7 @@
   ],
   "background": {
     "scripts": [
-      "user_interface/scripts/background/messageListener.js",
-      "user_interface/scripts/background/network.js"
+      "user_interface/scripts/background/messageListener.js"
     ],
     "type": "module",
     "persistent": false
