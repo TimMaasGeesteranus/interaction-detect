@@ -1,7 +1,7 @@
-document.addEventListener('mousemove', (event) => {
+document.addEventListener('keypress', (event) => {
     browser.runtime.sendMessage({
         type: "setBadgeText",
-        content: "M"
+        content: event.key
     });
 });
 

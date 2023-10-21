@@ -1,4 +1,4 @@
-const MAX_NUM_CALLS_TO_INTERCEPT = 2;
+const MAX_NUM_CALLS_TO_INTERCEPT = 200;
 
 console.log(interceptListeners());
 
@@ -17,8 +17,7 @@ function interceptListeners() {
 
                 accessCounts[type] = (accessCounts[type] || 0) + 1;
                 const callCnt = accessCounts[type];  // just a shorthand
-                if (callCnt >= MAX_NUM_CALLS_TO_INTERCEPT) {
-                    console.log(`max reached for type ${type}`);
+                if (callCnt > MAX_NUM_CALLS_TO_INTERCEPT) {
                     Object.defineProperty(elementType.prototype, funcName, {
                         value: function () {
                             return fn.apply(this, args);
