@@ -34,7 +34,8 @@
   ],
   "background": {
     "scripts": [
-      "user_interface/scripts/background/messageListener.js"
+      "user_interface/scripts/background/messageListener.js",
+      "user_interface/scripts/background/detectReplayScripts.js"
     ],
     "type": "module",
     "persistent": false
