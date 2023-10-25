@@ -11,6 +11,8 @@ let userInteractions = {
     paste: 0
 };
 
+let urlList = []
+
 function receiveMessage(message, sender, sendResponse) {
     const content = message["content"];
 
@@ -23,5 +25,15 @@ function receiveMessage(message, sender, sendResponse) {
             break;
         case "getUserInteractions":
             sendResponse(userInteractions);
+            break;
+        case "getScripts":
+            sendResponse(urlList);
+            break;
+    }
+}
+
+export function addToUrlList(url) {
+    if (!urlList.includes(url)) {
+        urlList.push(url);
     }
 }

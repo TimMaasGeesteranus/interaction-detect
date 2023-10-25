@@ -5,22 +5,24 @@ const content = document.getElementById('content');
 
 // Load home page
 browser.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
-    content.innerHTML = getContent(response);
+    content.innerHTML = getListenerContent(response);
 })
 
 // List page
 listButton.addEventListener('click', () => {
-    content.textContent = "To be implemented";
+    browser.runtime.sendMessage({ type: "getScripts" }, (response) => {
+        content.innerHTML = getScriptsContent(response);
+    })
 });
 
 // Home page
 homeButton.addEventListener('click', () => {
     browser.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
-        content.innerHTML = getContent(response);
+        content.innerHTML = getListenerContent(response);
     })
 });
 
-function getContent(interaction){
+function getListenerContent(interaction) {
     return `<div>
     mousemove: ${interaction["mousemove"]}
     <br>click: ${interaction["click"]}
@@ -31,4 +33,16 @@ function getContent(interaction){
     <br>cut: ${interaction["cut"]}
     <br>paste: ${interaction["paste"]}
     </div>`;
+}
+
+function getScriptsContent(scripts) {
+    let html = '<div><ul>';
+
+    for (let i = 0; i < scripts.length; i++) {
+        html += `<li>${scripts[i]}</li>`;
+    }
+
+    html += '</ul></div>';
+
+    return html;
 }

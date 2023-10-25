@@ -1,3 +1,5 @@
+import { setScript as addToUrlList } from "./messageListener.js";
+
 // Important variables!
 const measurementTime = 60000 // a minute
 const maxCountsPerMeasurementTime = 5;
@@ -28,7 +30,7 @@ function checkIfReplayScript() {
 
     for (const url in urlCounts) {
         if (urlCounts[url] > maxCountsPerMeasurementTime) {
-            console.log(`${url} might be a session replay script!`); // The important stuff!
+            addToUrlList(url); // add url to list
         }
     }
 }
@@ -42,7 +44,6 @@ function isFile(url) {
     return /\.[0-9a-z]+$/i.test(url);
 }
 
-function isWebsocket(url){
+function isWebsocket(url) {
     return /^wss?:\/\/.*/i.test(url);
 }
-
