@@ -6,16 +6,22 @@ document.addEventListener('keypress', (event) => {
 });
 
 document.addEventListener("listenerIntercepted", (event) => {
-    if (event.detail == "click") {
-        notifyUser();
+    switch (event.detail) {
+        case "click":
+            flickerBackground();
+            break;
+        case "mousemove":
+            changeMouseCursor();
+            break;
     }
+
     browser.runtime.sendMessage({
         type: "listenerIntercepted",
         content: event.detail
     })
 });
 
-function notifyUser() {
+function flickerBackground() {
     const originalBackgroundColor = document.body.style.backgroundColor;
 
     document.body.style.backgroundColor = '#354172';
@@ -24,3 +30,9 @@ function notifyUser() {
         document.body.style.backgroundColor = originalBackgroundColor; // Change it back to the original color (e.g., white)
     }, 100);
 }
+
+function changeMouseCursor() {
+    let scriptPath = chrome.runtime.getURL("img/exclamationMark.cur");
+    document.body.style.cursor = `url('${scriptPath}'), auto`;
+}
+
