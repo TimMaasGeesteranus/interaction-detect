@@ -1,4 +1,4 @@
-import { setScript as addToUrlList } from "./messageListener.js";
+import { addToUrlList } from "./messageListener.js";
 
 // Important variables!
 const measurementTime = 60000 // a minute
