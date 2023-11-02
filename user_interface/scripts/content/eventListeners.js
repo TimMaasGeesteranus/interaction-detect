@@ -13,6 +13,9 @@ document.addEventListener("listenerIntercepted", (event) => {
         case "mousemove":
             changeMouseCursor();
             break;
+        case "input":
+            markInputField(event.explicitOriginalTarget.id);
+            break;
     }
 
     browser.runtime.sendMessage({
@@ -34,5 +37,10 @@ function flickerBackground() {
 function changeMouseCursor() {
     let scriptPath = chrome.runtime.getURL("img/exclamationMark.cur");
     document.body.style.cursor = `url('${scriptPath}'), auto`;
+}
+
+function markInputField(id){
+    const inputField = document.getElementById(id)
+    inputField.style.backgroundColor = "#fb2737";
 }
 
