@@ -11,6 +11,8 @@ let userInteractions = {
     paste: 0
 };
 
+export let extensionEnabled = true;
+
 let urlList = []
 
 function receiveMessage(message, sender, sendResponse) {
@@ -29,6 +31,16 @@ function receiveMessage(message, sender, sendResponse) {
         case "getScripts":
             sendResponse(urlList);
             break;
+        case "enableExtension":
+            extensionEnabled = true;
+            break;
+        case "disableExtension":
+            extensionEnabled = false;
+            resetStats();
+            break;
+        case "getExtensionEnabled":
+            sendResponse(extensionEnabled);
+            break;
     }
 }
 
@@ -36,4 +48,14 @@ export function addToUrlList(url) {
     if (!urlList.includes(url)) {
         urlList.push(url);
     }
+}
+
+function resetStats(){
+    Object.keys(userInteractions).forEach(key => {
+        userInteractions[key] = 0;
+    });
+
+    urlList = [];
+
+    // TODO reset UI screen
 }

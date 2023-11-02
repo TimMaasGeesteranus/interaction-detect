@@ -1,6 +1,6 @@
 const MAX_NUM_CALLS_TO_INTERCEPT = 200;
 
-console.log(interceptListeners());
+interceptListeners();
 
 function interceptListeners() {
     const elementType = EventTarget;

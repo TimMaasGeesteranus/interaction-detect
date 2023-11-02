@@ -1,4 +1,5 @@
 import { addToUrlList } from "./messageListener.js";
+import { extensionEnabled } from "./messageListener.js";
 
 // Important variables!
 const measurementTime = 60000 // a minute
@@ -9,6 +10,10 @@ let requests = [];
 browser.webRequest.onBeforeRequest.addListener(manageRequestList, { urls: ["<all_urls>"] });
 
 function manageRequestList(request) {
+    if (!extensionEnabled){
+        return;
+    }
+
     const url = getBaseUrl(request.url);
     if (isFile(url) || isWebsocket(url) || request.method != "POST") { // filter out all 
         return;

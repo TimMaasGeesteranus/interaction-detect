@@ -1,4 +1,3 @@
-
 const homeButton = document.getElementById('homeButton');
 const listButton = document.getElementById('listButton');
 const content = document.getElementById('content');
