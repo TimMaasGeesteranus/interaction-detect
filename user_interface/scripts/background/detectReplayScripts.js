@@ -5,30 +5,30 @@ import { extensionEnabled } from "./messageListener.js";
 const measurementTime = 60000 // a minute
 const maxCountsPerMeasurementTime = 5;
 
-let requests = [];
+let requestList = [];
 
 browser.webRequest.onBeforeRequest.addListener(manageRequestList, { urls: ["<all_urls>"] });
 
 function manageRequestList(request) {
-    if (!extensionEnabled){
+    if (!extensionEnabled) {
         return;
     }
 
     const url = getBaseUrl(request.url);
-    if (isFile(url) || isWebsocket(url) || request.method != "POST") { // filter out all 
+    if (isFile(url) || isWebsocket(url) || request.method != "POST") {
         return;
     }
     const currentTime = new Date().getTime();
 
-    requests.push({ url: url, timestamp: currentTime }) // add new request
-    requests = requests.filter(item => item.timestamp >= currentTime - measurementTime) // remove old requests
+    requestList.push({ url: url, timestamp: currentTime }) // add new request
+    requestList = requestList.filter(item => item.timestamp >= currentTime - measurementTime) // remove old requests
 
-    checkIfReplayScript();
+    checkListForReplayScripts();
 }
 
 // finds: Glassbox, RUM Datadog, Clarity
-function checkIfReplayScript() {
-    const urlCounts = requests.reduce((counts, item) => {
+function checkListForReplayScripts() {
+    const urlCounts = requestList.reduce((counts, item) => {
         counts[item.url] = (counts[item.url] || 0) + 1;
         return counts;
     }, {});

@@ -9,7 +9,10 @@ browser.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
 
 // List page
 listButton.addEventListener('click', () => {
-    browser.runtime.sendMessage({ type: "getScripts" }, (response) => {
+    // browser.runtime.sendMessage({ type: "getScripts" }, (response) => {
+    //     content.innerHTML = getScriptsContent(response);
+    // })
+    browser.runtime.sendMessage({ type: "getScriptsWithListeners" }, (response) => {
         content.innerHTML = getScriptsContent(response);
     })
 });

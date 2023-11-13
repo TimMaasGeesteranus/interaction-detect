@@ -11,6 +11,8 @@ let userInteractions = {
     paste: 0
 };
 
+let scriptsWithListeners = [];
+
 export let extensionEnabled = true;
 
 let urlList = []
@@ -23,10 +25,17 @@ function receiveMessage(message, sender, sendResponse) {
             browser.browserAction.setBadgeText({ text: content });
             break;
         case "listenerIntercepted":
-            userInteractions[content]++;
+            console.log(`listener came from cript: ${content["url"]}`)
+            userInteractions[content["type"]]++;
+            if (!scriptsWithListeners.includes(content["url"])) {
+                scriptsWithListeners.push(content["url"]);
+            }
             break;
         case "getUserInteractions":
             sendResponse(userInteractions);
+            break;
+        case "getScriptsWithListeners":
+            sendResponse(scriptsWithListeners);
             break;
         case "getScripts":
             sendResponse(urlList);
@@ -50,7 +59,7 @@ export function addToUrlList(url) {
     }
 }
 
-function resetStats(){
+function resetStats() {
     Object.keys(userInteractions).forEach(key => {
         userInteractions[key] = 0;
     });

@@ -3,13 +3,10 @@ const MAX_NUM_CALLS_TO_INTERCEPT = 200;
 interceptListeners();
 
 function interceptListeners() {
-    const elementType = EventTarget;
-    const funcName = "addEventListener";
-    const origFunc = elementType.prototype[funcName];
-
+    const origFunc = EventTarget.prototype["addEventListener"];
     let accessCounts = {};
 
-    Object.defineProperty(elementType.prototype, funcName, {
+    Object.defineProperty(EventTarget.prototype, "addEventListener", {
         value: function (type, fn, ...rest) {
             origFunc.call(this, type, function (...args) {
 
@@ -18,7 +15,7 @@ function interceptListeners() {
                 accessCounts[type] = (accessCounts[type] || 0) + 1;
                 const callCnt = accessCounts[type];  // just a shorthand
                 if (callCnt > MAX_NUM_CALLS_TO_INTERCEPT) {
-                    Object.defineProperty(elementType.prototype, funcName, {
+                    Object.defineProperty(EventTarget.prototype, "addEventListener", {
                         value: function () {
                             return fn.apply(this, args);
                         }
@@ -26,8 +23,11 @@ function interceptListeners() {
                     return fn.apply(this, args);;
                 }
 
+                // get caller script
+                const originatingScript = getOriginatingScriptUrl();
+
                 // Send message that listener was intercepted
-                sendMessageToContentScript(type);               
+                sendMessageToContentScript("listenerIntercepted", {type: type, url: originatingScript});
 
                 // And execute original code
                 return fn.apply(this, args);
@@ -36,10 +36,26 @@ function interceptListeners() {
     });
 }
 
-function sendMessageToContentScript(message){
+function sendMessageToContentScript(type, message) {
     document.dispatchEvent(
-        new CustomEvent("listenerIntercepted", {detail: message})
+        new CustomEvent(type, { detail: message })
     )
+}
+
+function getOriginatingScriptUrl() {
+    const stackTrace = new Error().stack;
+    if (stackTrace) {
+        const lines = stackTrace.split('\n');
+        // Go through stacktrace to find script
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            // Check if the line contains a script URL
+            const match = line.match(/http.*.js:\d+:\d+/)
+            if (match) {
+                return match[0];
+            }
+        }
+    }
 }
 
 
