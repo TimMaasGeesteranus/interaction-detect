@@ -25,7 +25,6 @@ function receiveMessage(message, sender, sendResponse) {
             browser.browserAction.setBadgeText({ text: content });
             break;
         case "listenerIntercepted":
-            console.log(`listener came from cript: ${content["url"]}`)
             userInteractions[content["type"]]++;
             if (!scriptsWithListeners.includes(content["url"])) {
                 scriptsWithListeners.push(content["url"]);
