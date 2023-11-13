@@ -15,7 +15,7 @@ function manageRequestList(request) {
     }
 
     const url = getBaseUrl(request.url);
-    if (isFile(url) || isWebsocket(url) || request.method != "POST") {
+    if (isFile(url) || isWebsocket(url) || !(request.method == "POST" || request.method == "GET")) {
         return;
     }
     const currentTime = new Date().getTime();
