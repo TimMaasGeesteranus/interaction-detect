@@ -5,13 +5,16 @@ document.addEventListener('keypress', (event) => {
     });
 });
 
+let mousemoveDetected = false;
+
 document.addEventListener("listenerIntercepted", (event) => {
-    switch (event.detail) {
+    switch (event.detail.type) {
         case "click":
-            flickerBackground();
+            setCursorWarning();
             break;
         case "mousemove":
-            changeMouseCursor();
+            mousemoveDetected = true;
+            setCursorRed();
             break;
         case "input":
             markInputField(event.explicitOriginalTarget.id);
@@ -24,22 +27,22 @@ document.addEventListener("listenerIntercepted", (event) => {
     })
 });
 
-function flickerBackground() {
-    const originalBackgroundColor = document.body.style.backgroundColor;
-
-    document.body.style.backgroundColor = '#354172';
-
-    setTimeout(() => {
-        document.body.style.backgroundColor = originalBackgroundColor; // Change it back to the original color (e.g., white)
-    }, 100);
-}
-
-function changeMouseCursor() {
-    let scriptPath = chrome.runtime.getURL("img/exclamationMark.cur");
+function setCursorRed() {
+    let scriptPath = chrome.runtime.getURL("img/red.cur");
     document.body.style.cursor = `url('${scriptPath}'), auto`;
 }
 
-function markInputField(id){
+function setCursorWarning() {
+    let scriptPath = chrome.runtime.getURL("img/warning.cur");
+    document.body.style.cursor = `url('${scriptPath}'), auto`;
+
+    // reset cursor
+    setTimeout(() => {
+        mousemoveDetected ? setCursorRed() : document.body.style.cursor = "default";
+    }, 1000)
+}
+
+function markInputField(id) {
     const inputField = document.getElementById(id)
     inputField.style.backgroundColor = "#fb2737";
 }

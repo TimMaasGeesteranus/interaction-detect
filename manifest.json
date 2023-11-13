@@ -43,6 +43,7 @@
   "manifest_version": 2,
   "web_accessible_resources": [
     "user_interface/scripts/page/eventDetection.js",
-    "img/exclamationMark.cur"
+    "img/red.cur",
+    "img/warning.cur"
   ]
 }
