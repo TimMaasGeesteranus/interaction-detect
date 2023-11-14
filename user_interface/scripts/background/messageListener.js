@@ -1,5 +1,6 @@
-browser.runtime.onMessage.addListener(receiveMessage);
-
+export let extensionEnabled = true;
+let scriptsWithListeners = [];
+let urlList = []
 let userInteractions = {
     mousemove: 0,
     click: 0,
@@ -11,11 +12,8 @@ let userInteractions = {
     paste: 0
 };
 
-let scriptsWithListeners = [];
-
-export let extensionEnabled = true;
-
-let urlList = []
+// Receive messages from extension popup and background scripts
+browser.runtime.onMessage.addListener(receiveMessage);
 
 function receiveMessage(message, sender, sendResponse) {
     const content = message["content"];

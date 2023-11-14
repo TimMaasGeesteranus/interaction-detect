@@ -1,3 +1,6 @@
+let mousemoveDetected = false;
+
+// Example usage of setBadgeText
 document.addEventListener('keypress', (event) => {
     browser.runtime.sendMessage({
         type: "setBadgeText",
@@ -5,8 +8,7 @@ document.addEventListener('keypress', (event) => {
     });
 });
 
-let mousemoveDetected = false;
-
+// Listen for custom "listenerIntercepted" events
 document.addEventListener("listenerIntercepted", (event) => {
     switch (event.detail.type) {
         case "click":
@@ -46,4 +48,3 @@ function markInputField(id) {
     const inputField = document.getElementById(id)
     inputField.style.backgroundColor = "#fb2737";
 }
-

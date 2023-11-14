@@ -18,27 +18,31 @@ function manageRequestList(request) {
     }
 
     const url = getBaseUrl(request.url);
+
+    // Determine if the request should be processed
     if (isFile(url) || isWebsocket(url) || !(request.method == "POST" || request.method == "GET")) {
         return;
     }
     const currentTime = new Date().getTime();
 
-    requestList.push({ url: url, timestamp: currentTime }) // add new request
-    requestList = requestList.filter(item => item.timestamp >= currentTime - measurementTime) // remove old requests
+    requestList.push({ url: url, timestamp: currentTime }) // add new request to list
+    requestList = requestList.filter(item => item.timestamp >= currentTime - measurementTime) // remove old requests from list
 
     checkListForReplayScripts();
 }
 
 // finds: Glassbox, RUM Datadog, Clarity
 function checkListForReplayScripts() {
+    // Counts occurrences of each URL in request list
     const urlCounts = requestList.reduce((counts, item) => {
         counts[item.url] = (counts[item.url] || 0) + 1;
         return counts;
     }, {});
 
+    // Check if URL exceeds the maximum allowed counts
     for (const url in urlCounts) {
         if (urlCounts[url] > maxCountsPerMeasurementTime) {
-            addToUrlList(url); // add url to list
+            addToUrlList(url); // add url to session replay url list
         }
     }
 }
