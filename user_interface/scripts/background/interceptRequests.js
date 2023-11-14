@@ -5,18 +5,15 @@ import { extensionEnabled } from "./messageListener.js";
 const measurementTime = 60000 // a minute
 const maxCountsPerMeasurementTime = 5;
 
-let pageLoaded = false;
 let requestList = [];
-
-browser.webRequest.onBeforeRequest.addListener(manageRequestList, { urls: ["<all_urls>"] });
 
 // Listen to requests after the page has been loaded
 browser.webNavigation.onCompleted.addListener(() => {
-    pageLoaded = true;
+    browser.webRequest.onBeforeRequest.addListener(manageRequestList, { urls: ["<all_urls>"] });
 });
 
 function manageRequestList(request) {
-    if (!extensionEnabled || !pageLoaded) {
+    if (!extensionEnabled) {
         return;
     }
 
