@@ -1,7 +1,7 @@
 export let extensionEnabled = true;
-let scriptsWithListeners = [];
-let urlList = []
-let userInteractions = {
+let scriptsContainingListeners = [];
+let trackedUrls = []
+let interactionCounts = {
     mousemove: 0,
     click: 0,
     keypress: 0,
@@ -13,9 +13,9 @@ let userInteractions = {
 };
 
 // Receive messages from extension popup and background scripts
-browser.runtime.onMessage.addListener(receiveMessage);
+browser.runtime.onMessage.addListener(handleMessage);
 
-function receiveMessage(message, sender, sendResponse) {
+function handleMessage(message, sender, sendResponse) {
     const content = message["content"];
 
     switch (message["type"]) {
@@ -23,19 +23,16 @@ function receiveMessage(message, sender, sendResponse) {
             browser.browserAction.setBadgeText({ text: content });
             break;
         case "listenerIntercepted":
-            userInteractions[content["type"]]++;
-            if (!scriptsWithListeners.includes(content["url"])) {
-                scriptsWithListeners.push(content["url"]);
-            }
+            processInterceptedListeners(content)
             break;
         case "getUserInteractions":
-            sendResponse(userInteractions);
+            sendResponse(interactionCounts);
             break;
         case "getScriptsWithListeners":
-            sendResponse(scriptsWithListeners);
+            sendResponse(scriptsContainingListeners);
             break;
         case "getScripts":
-            sendResponse(urlList);
+            sendResponse(trackedUrls);
             break;
         case "enableExtension":
             extensionEnabled = true;
@@ -50,18 +47,29 @@ function receiveMessage(message, sender, sendResponse) {
     }
 }
 
-export function addToUrlList(url) {
-    if (!urlList.includes(url)) {
-        urlList.push(url);
+export function addToTrackedUrls(url) {
+    if (!trackedUrls.includes(url)) {
+        trackedUrls.push(url);
     }
 }
 
 function resetStats() {
-    Object.keys(userInteractions).forEach(key => {
-        userInteractions[key] = 0;
+    Object.keys(interactionCounts).forEach(key => {
+        interactionCounts[key] = 0;
     });
 
-    urlList = [];
+    trackedUrls = [];
 
     // TODO reset UI screen
+}
+
+// Add each intercepted listener call to correct counters and lists
+function processInterceptedListeners(eventsArray) {
+    for (let event of eventsArray) {
+        interactionCounts[event["type"]]++;
+        if (!scriptsContainingListeners.includes(event["url"])) {
+            scriptsContainingListeners.push(event["url"]);
+        }
+    }
+
 }

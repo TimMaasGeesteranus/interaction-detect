@@ -1,40 +1,44 @@
-const MAX_NUM_CALLS_TO_INTERCEPT = 200;
+const MAX_INTERCEPTION_COUNT = 200;
+let interceptedEvents = [];
+let interceptionTimer;
 
-// original listener that we intercepted
-const origFunc = EventTarget.prototype["addEventListener"];
-let accessCounts = {};
+interceptEventListener();
 
-// Override the addEventListener method
-Object.defineProperty(EventTarget.prototype, "addEventListener", {
-    value: function (type, fn, ...rest) {
-        origFunc.call(this, type, function (...args) {
+function interceptEventListener() {
+    // original listener that we intercepted
+    const origFunc = EventTarget.prototype["addEventListener"];
+    let eventCounts = {};
 
-            // Get caller script
-            const originatingScript = getOriginatingScriptUrl();
+    // Override the addEventListener method
+    Object.defineProperty(EventTarget.prototype, "addEventListener", {
+        value: function (type, fn, ...rest) {
+            origFunc.call(this, type, function (...args) {
+                // Get caller script
+                const originatingScript = getOriginatingScriptUrl();
 
-            // Count the amount of interceptions
-            accessCounts[originatingScript] = accessCounts[originatingScript] || {};
-            accessCounts[originatingScript][type] = (accessCounts[originatingScript][type] || 0) + 1;
-            const callCnt = accessCounts[originatingScript][type];
-            
-            if (callCnt > MAX_NUM_CALLS_TO_INTERCEPT) {
-                // Restore original function when maximum number of interceptions has been reached
-                Object.defineProperty(EventTarget.prototype, "addEventListener", {
-                    value: function () {
-                        return fn.apply(this, args);
-                    }
-                });
+                // Count the amount of interceptions
+                eventCounts[originatingScript] = eventCounts[originatingScript] || {};
+                eventCounts[originatingScript][type] = (eventCounts[originatingScript][type] || 0) + 1;
+                const callCnt = eventCounts[originatingScript][type];
+
+                if (callCnt > MAX_INTERCEPTION_COUNT) {
+                    // Restore original function when maximum number of interceptions has been reached
+                    Object.defineProperty(EventTarget.prototype, "addEventListener", {
+                        value: function () {
+                            return fn.apply(this, args);
+                        }
+                    });
+                    return fn.apply(this, args);
+                }
+
+                registerInterception({ type: type, url: originatingScript });
+
+                // Execute original code
                 return fn.apply(this, args);
-            }
-
-            // Send message that listener was intercepted
-            sendMessageToContentScript("listenerIntercepted", { type: type, url: originatingScript });
-
-            // Execute original code
-            return fn.apply(this, args);
-        }, ...rest);
-    }
-});
+            }, ...rest);
+        }
+    });
+}
 
 function sendMessageToContentScript(type, message) {
     document.dispatchEvent(
@@ -57,4 +61,17 @@ function getOriginatingScriptUrl() {
             }
         }
     }
+}
+
+function registerInterception(call) {
+    interceptedEvents.push(call);
+
+    // Clear the previous logging interval
+    clearTimeout(interceptionTimer);
+
+    // Send the intercepted calls after 1sec of inactivity
+    interceptionTimer = setTimeout(() => {
+        sendMessageToContentScript("listenerIntercepted", interceptedEvents);
+        interceptedEvents = [];
+    }, 1000);
 }
