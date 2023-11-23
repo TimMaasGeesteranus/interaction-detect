@@ -1,4 +1,4 @@
-import { addToUrlList } from "./messageListener.js";
+import { addToTrackedUrls } from "./messageListener.js";
 import { extensionEnabled } from "./messageListener.js";
 
 // Important variables!
@@ -42,7 +42,8 @@ function checkListForReplayScripts() {
     // Check if URL exceeds the maximum allowed counts
     for (const url in urlCounts) {
         if (urlCounts[url] > maxCountsPerMeasurementTime) {
-            addToUrlList(url); // add url to session replay url list
+            console.log(`Replay url: ${url}`)
+            addToTrackedUrls(url); // add url to session replay url list
         }
     }
 }
