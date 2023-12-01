@@ -17,12 +17,15 @@ function manageRequestList(request) {
         return;
     }
 
-    const url = getBaseUrl(request.url);
+    let url = request.url;
 
     // Determine if the request should be processed
     if (isFile(url) || isWebsocket(url) || !(request.method == "POST" || request.method == "GET")) {
         return;
     }
+
+    url = getBaseUrl(url);
+
     const currentTime = new Date().getTime();
 
     requestList.push({ url: url, timestamp: currentTime }) // add new request to list
@@ -42,7 +45,6 @@ function checkListForReplayScripts() {
     // Check if URL exceeds the maximum allowed counts
     for (const url in urlCounts) {
         if (urlCounts[url] > maxCountsPerMeasurementTime) {
-            console.log(`Replay url: ${url}`)
             addToTrackedUrls(url); // add url to session replay url list
         }
     }
@@ -50,7 +52,7 @@ function checkListForReplayScripts() {
 
 function getBaseUrl(url) {
     const urlObject = new URL(url);
-    return urlObject.protocol + '//' + urlObject.hostname + urlObject.pathname;
+    return urlObject.protocol + '//' + urlObject.hostname;
 }
 
 function isFile(url) {

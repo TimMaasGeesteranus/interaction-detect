@@ -1,6 +1,8 @@
+import { listReplayTools } from "./replayToolDetector.js";
+
 export let extensionEnabled = true;
 let scriptsContainingListeners = [];
-let trackedUrls = []
+let trackedUrls = [];
 let interactionCounts = {
     mousemove: 0,
     click: 0,
@@ -11,6 +13,7 @@ let interactionCounts = {
     cut: 0,
     paste: 0
 };
+let eventsArray = [];
 
 // Receive messages from extension popup and background scripts
 browser.runtime.onMessage.addListener(handleMessage);
@@ -22,7 +25,8 @@ function handleMessage(message, sender, sendResponse) {
         case "setBadgeText":
             browser.browserAction.setBadgeText({ text: content });
             break;
-        case "listenerIntercepted":
+        case "listenerIntercepted": //from eventDetection.js
+            eventsArray = content;
             processInterceptedListeners(content)
             break;
         case "getUserInteractions":
@@ -44,10 +48,13 @@ function handleMessage(message, sender, sendResponse) {
         case "getExtensionEnabled":
             sendResponse(extensionEnabled);
             break;
+        case "getReplayScripts":
+            sendResponse(listReplayTools(trackedUrls, eventsArray));
+            break;
     }
 }
 
-export function addToTrackedUrls(url) {
+export function addToTrackedUrls(url) { // gets called form interceptRequests
     if (!trackedUrls.includes(url)) {
         trackedUrls.push(url);
     }

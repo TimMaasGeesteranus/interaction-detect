@@ -54,10 +54,11 @@ function getOriginatingScriptUrl() {
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             // Check if the line contains a script URL
-            const match = line.match(/http.*.js:\d+:\d+/)
+            const match = line.match(/(http.*.js):\d+:\d+/)
             //const match = line.match(/C.*.js:\d+:\d+/) // For testing locally
             if (match) {
-                return match[0];
+                url = getBaseUrl(match[0]);
+                return url
             }
         }
     }
@@ -74,4 +75,9 @@ function registerInterception(call) {
         sendMessageToContentScript("listenerIntercepted", interceptedEvents);
         interceptedEvents = [];
     }, 1000);
+}
+
+function getBaseUrl(url) {
+    const urlObject = new URL(url);
+    return urlObject.protocol + '//' + urlObject.hostname;
 }

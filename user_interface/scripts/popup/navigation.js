@@ -7,6 +7,9 @@ browser.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
     content.innerHTML = getListenerContent(response);
 })
 
+browser.runtime.sendMessage({ type: "getReplayScripts" }, (response) => {
+    
+})
 // List page
 listButton.addEventListener('click', () => {
     // browser.runtime.sendMessage({ type: "getScripts" }, (response) => {
