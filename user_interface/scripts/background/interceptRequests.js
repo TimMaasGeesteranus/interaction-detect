@@ -8,8 +8,8 @@ const maxCountsPerMeasurementTime = 5;
 let requestList = [];
 
 // Listen to requests after the page has been loaded
-browser.webNavigation.onCompleted.addListener(() => {
-    browser.webRequest.onBeforeRequest.addListener(manageRequestList, { urls: ["<all_urls>"] });
+chrome.webNavigation.onCompleted.addListener(() => {
+    chrome.webRequest.onBeforeRequest.addListener(manageRequestList, { urls: ["<all_urls>"] }, ["requestBody"]);
 });
 
 function manageRequestList(request) {

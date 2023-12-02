@@ -5,14 +5,12 @@
   "permissions": [
     "activeTab",
     "webRequest",
-    "webRequestBlocking",
-    "<all_urls>",
     "webNavigation",
     "storage",
     "tabs",
     "contextMenus"
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "user_interface/html/popup.html",
     "default_icon": { //"Designed by Alvaro_cabrera / Freepik"
       "16": "img/inspect16.png",
@@ -33,17 +31,23 @@
     }
   ],
   "background": {
-    "scripts": [
-      "user_interface/scripts/background/messageListener.js",
-      "user_interface/scripts/background/interceptRequests.js"
-    ],
-    "type": "module",
-    "persistent": false
+    "service_worker": "user_interface/scripts/background/service_worker.js",
+    "type": "module"
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "web_accessible_resources": [
-    "user_interface/scripts/page/eventDetection.js",
-    "img/red.cur",
-    "img/warning.cur"
-  ]
+    {
+      "resources": [
+        "user_interface/scripts/page/eventDetection.js",
+        "img/red.cur",
+        "img/warning.cur"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
 }

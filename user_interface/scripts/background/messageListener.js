@@ -1,5 +1,3 @@
-import { listReplayTools } from "./replayToolDetector.js";
-
 export let extensionEnabled = true;
 let scriptsContainingListeners = [];
 let trackedUrls = [];
@@ -16,14 +14,14 @@ let interactionCounts = {
 let eventsArray = [];
 
 // Receive messages from extension popup and background scripts
-browser.runtime.onMessage.addListener(handleMessage);
+chrome.runtime.onMessage.addListener(handleMessage);
 
 function handleMessage(message, sender, sendResponse) {
     const content = message["content"];
 
     switch (message["type"]) {
         case "setBadgeText":
-            browser.browserAction.setBadgeText({ text: content });
+            chrome.browserAction.setBadgeText({ text: content });
             break;
         case "listenerIntercepted": //from eventDetection.js
             eventsArray = content;
@@ -47,9 +45,6 @@ function handleMessage(message, sender, sendResponse) {
             break;
         case "getExtensionEnabled":
             sendResponse(extensionEnabled);
-            break;
-        case "getReplayScripts":
-            sendResponse(listReplayTools(trackedUrls, eventsArray));
             break;
     }
 }

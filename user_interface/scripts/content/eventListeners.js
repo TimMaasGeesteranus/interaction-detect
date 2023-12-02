@@ -2,7 +2,7 @@ let mousemoveDetected = false;
 
 // Example usage of setBadgeText
 document.addEventListener('keypress', (event) => {
-    browser.runtime.sendMessage({
+    chrome.runtime.sendMessage({
         type: "setBadgeText",
         content: event.key
     });
@@ -23,7 +23,7 @@ document.addEventListener("listenerIntercepted", (event) => {
             break;
     }
 
-    browser.runtime.sendMessage({
+    chrome.runtime.sendMessage({
         type: "listenerIntercepted",
         content: event.detail
     })

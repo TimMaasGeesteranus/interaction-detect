@@ -3,26 +3,23 @@ const listButton = document.getElementById('listButton');
 const content = document.getElementById('content');
 
 // Load home page
-browser.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
+chrome.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
     content.innerHTML = getListenerContent(response);
 })
 
-browser.runtime.sendMessage({ type: "getReplayScripts" }, (response) => {
-    
-})
 // List page
 listButton.addEventListener('click', () => {
-    // browser.runtime.sendMessage({ type: "getScripts" }, (response) => {
+    // chrome.runtime.sendMessage({ type: "getScripts" }, (response) => {
     //     content.innerHTML = getScriptsContent(response);
     // })
-    browser.runtime.sendMessage({ type: "getScriptsWithListeners" }, (response) => {
+    chrome.runtime.sendMessage({ type: "getScriptsWithListeners" }, (response) => {
         content.innerHTML = getScriptsContent(response);
     })
 });
 
 // Home page
 homeButton.addEventListener('click', () => {
-    browser.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
+    chrome.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
         content.innerHTML = getListenerContent(response);
     })
 });
