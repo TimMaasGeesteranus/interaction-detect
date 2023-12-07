@@ -1,6 +1,15 @@
-var s = document.createElement('script');
-s.src = chrome.runtime.getURL('user_interface/scripts/page/eventDetection.js');
-s.onload = function() {
-    this.remove();
-};
-(document.head || document.documentElement).appendChild(s);
+const scriptUrls = [
+    'user_interface/scripts/page/events.js',
+    'user_interface/scripts/page/requests.js'
+]
+
+scriptUrls.forEach(injectScript);
+
+function injectScript(item) {
+    var s = document.createElement('script');
+    s.src = chrome.runtime.getURL(item);
+    s.onload = function () {
+        this.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
+}

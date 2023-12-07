@@ -2,6 +2,9 @@
   "name": "interaction-detect",
   "version": "1.0",
   "description": "Detect session replay scripts",
+  "host_permissions": [
+    "*://*/*"
+  ],
   "permissions": [
     "activeTab",
     "webRequest",
@@ -38,7 +41,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "user_interface/scripts/page/eventDetection.js",
+        "user_interface/scripts/page/events.js",
+        "user_interface/scripts/page/requests.js",
         "img/red.cur",
         "img/warning.cur"
       ],

@@ -22,11 +22,6 @@ document.addEventListener("listenerIntercepted", (event) => {
             markInputField(event.explicitOriginalTarget.id);
             break;
     }
-
-    chrome.runtime.sendMessage({
-        type: "listenerIntercepted",
-        content: event.detail
-    })
 });
 
 function setCursorRed() {
