@@ -37,19 +37,17 @@ function interceptRequests() {
     };
 
     function getInitiatorScript() {
-
         const stackTrace = new Error().stack;
         if (stackTrace) {
             const lines = stackTrace.split('\n');
+            
             // Go through stacktrace to find script
             for (let i = lines.length - 1; i >= 0; i--) {
-
                 const line = lines[i];
+
                 // Check if the line contains a script URL
                 const match = line.match(/(http.*.js)/)
-
                 if (match) {
-                    //url = getBaseUrl(match[0]);
                     return match[0];
                 }
             }

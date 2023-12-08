@@ -1,83 +1,102 @@
-// const MAX_INTERCEPTION_COUNT = 200;
-// let interceptedEvents = [];
-// let interceptionTimer;
+const MAX_INTERCEPTION_COUNT = 200;
+const typesToInclude = ["click", "pointerdown", "mousemove", "mouseover", "mouseout", "mousedown", "mouseup", "scroll", "wheel", "keydown", "keyup", "keypress", "input"];
+let scriptsWithListeners = [];
+let interceptionTimer;
 
-// interceptEventListener();
+interceptEventListener();
 
-// function interceptEventListener() {
-//     // original listener that we intercepted
-//     const origFunc = EventTarget.prototype["addEventListener"];
-//     let eventCounts = {};
+function interceptEventListener() {
+    // original listener that we intercepted
+    const origFunc = EventTarget.prototype["addEventListener"];
 
-//     // Override the addEventListener method
-//     Object.defineProperty(EventTarget.prototype, "addEventListener", {
-//         value: function (type, fn, ...rest) {
-//             origFunc.call(this, type, function (...args) {
-//                 // Get caller script
-//                 const originatingScript = getOriginatingScriptUrl();
+    // Override the addEventListener method
+    Object.defineProperty(EventTarget.prototype, "addEventListener", {
+        value: function (type, fn, ...rest) {
 
-//                 // Count the amount of interceptions
-//                 eventCounts[originatingScript] = eventCounts[originatingScript] || {};
-//                 eventCounts[originatingScript][type] = (eventCounts[originatingScript][type] || 0) + 1;
-//                 const callCnt = eventCounts[originatingScript][type];
+            if (typesToInclude.includes(type)) {
+                const initiatorScript = getInitiatorScript(); // Get script that evenListener is located in
+                if (initiatorScript != undefined) {
+                    addToScriptsWithListeners(initiatorScript, type);
+                }
+            }
 
-//                 if (callCnt > MAX_INTERCEPTION_COUNT) {
-//                     // Restore original function when maximum number of interceptions has been reached
-//                     Object.defineProperty(EventTarget.prototype, "addEventListener", {
-//                         value: function () {
-//                             return fn.apply(this, args);
-//                         }
-//                     });
-//                     return fn.apply(this, args);
-//                 }
+            origFunc.call(this, type, function (...args) {
+                if (fn != undefined) {
+                    return fn.apply(this, args);
+                }
+            }, ...rest);
+        }
+    });
+}
 
-//                 registerInterception({ type: type, url: originatingScript });
+function addToScriptsWithListeners(script, type) {
+    // Check if script already is in array
+    let scriptIndex = scriptsWithListeners.findIndex(obj => obj.script === script);
 
-//                 // Execute original code
-//                 return fn.apply(this, args);
-//             }, ...rest);
-//         }
-//     });
-// }
+    if (scriptIndex !== -1) {
+        scriptsWithListeners[scriptIndex]["total"]++ // Increment total counter
+        scriptsWithListeners[scriptIndex][type]++ // Increment type counter
+    }
+    else {
+        let newScript = {
+            "script": script,
+            "total": 0,
+            "click": 0,
+            "pointerdown": 0,
+            "mousemove": 0,
+            "mouseover": 0,
+            "mouseout": 0,
+            "mousedown": 0,
+            "mouseup": 0,
+            "scroll": 0,
+            "wheel": 0,
+            "keydown": 0,
+            "keyup": 0,
+            "keypress": 0,
+            "input": 0,
+        }
+        newScript[type]++; // Increment total counter
+        newScript["total"]++; // Increment type counter
+        scriptsWithListeners.push(newScript); // Add to array
+    }
+}
 
-// function sendMessageToContentScript(type, message) {
-//     document.dispatchEvent(
-//         new CustomEvent(type, { detail: message })
-//     )
-// }
+function getInitiatorScript() {
+    const stackTrace = new Error().stack;
+    if (stackTrace) {
+        const lines = stackTrace.split('\n');
 
-// function getOriginatingScriptUrl() {
-//     const stackTrace = new Error().stack;
-//     if (stackTrace) {
-//         const lines = stackTrace.split('\n');
-//         // Go through stacktrace to find script
-//         for (let i = 0; i < lines.length; i++) {
-//             const line = lines[i];
-//             // Check if the line contains a script URL
-//             const match = line.match(/(http.*.js):\d+:\d+/)
-//             //const match = line.match(/C.*.js:\d+:\d+/) // For testing locally
-//             if (match) {
-//                 url = getBaseUrl(match[0]);
-//                 return url
-//             }
-//         }
-//     }
-// }
+        // Go through stacktrace to find script
+        for (let i = lines.length - 1; i >= 0; i--) {
+            const line = lines[i];
 
-// function registerInterception(call) {
-//     interceptedEvents.push(call);
+            // Check if the line contains a script URL
+            const match = line.match(/(http.*.js)/)
+            if (match) {
+                return match[0]
+            }
+        }
+    }
+}
+
+//TODO send scripts with eventlisteners to popup
+
+// function registerInterception(call) { //Still needed?
+//     scriptsWithListeners.push(call);
 
 //     // Clear the previous logging interval
 //     clearTimeout(interceptionTimer);
 
 //     // Send the intercepted calls after 1sec of inactivity
 //     interceptionTimer = setTimeout(() => {
-//         sendMessageToContentScript("listenerIntercepted", interceptedEvents);
-//         interceptedEvents = [];
+//         //sendMessageToContentScript("listenerIntercepted", interceptedEvents);
+//         console.log("EVENTS: " + scriptsWithListeners);
+//         scriptsWithListeners = [];
 //     }, 1000);
 // }
 
-// function getBaseUrl(url) {
-//     const urlObject = new URL(url);
-//     return urlObject.protocol + '//' + urlObject.hostname;
+// function sendMessageToContentScript(type, message) {
+//     document.dispatchEvent(
+//         new CustomEvent(type, { detail: message })
+//     )
 // }
