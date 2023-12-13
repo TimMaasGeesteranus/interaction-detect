@@ -1,5 +1,7 @@
-const measurementTime = 60000 // a minute
-const maxCountsPerMeasurementTime = 5;
+const MEASUREMENT_TIME = 60000 // a minute
+const MAX_COUNTS_PER_MEASUREMENT_TIME = 5;
+const MIN_URL_SIZE = 50;
+const MIN_BODY_SIZE = 10000;
 
 let requestList = [];
 let SRSSet = new Set();
@@ -16,7 +18,14 @@ function interceptRequests() {
 
     window.fetch = function (url, options) {
         let initiatorScript = getInitiatorScript();
-        addToRequestList("fetch", url, typeof options !== 'undefined' ? options.method : null, initiatorScript);
+
+        let method = null;
+        let body = null;
+        if (typeof options != 'undefined') {
+            method = options.method;
+            body = options.body;
+        }
+        addToRequestList("fetch", url, method, body, initiatorScript);
         return originalFetch.apply(this, arguments);
     }
 
@@ -30,7 +39,7 @@ function interceptRequests() {
 
     XHR.send = function (postData) { // This function sends the HTTP request
         this.addEventListener('load', function () {
-            addToRequestList("XHR", this._url, this._method, this._initiatorScript);
+            addToRequestList("XHR", this._url, this._method, postData, this._initiatorScript);
 
         });
         return send.apply(this, arguments);
@@ -40,7 +49,7 @@ function interceptRequests() {
         const stackTrace = new Error().stack;
         if (stackTrace) {
             const lines = stackTrace.split('\n');
-            
+
             // Go through stacktrace to find script
             for (let i = lines.length - 1; i >= 0; i--) {
                 const line = lines[i];
@@ -55,7 +64,7 @@ function interceptRequests() {
     }
 };
 
-function addToRequestList(type, url, method, initiatorScript) {
+function addToRequestList(type, url, method, body, initiatorScript) {
     const currentTime = new Date().getTime();
 
     if (!(method == "POST" || method == "GET" || method == "post" || method == "get")) { // Only consider get and post requests
@@ -65,17 +74,19 @@ function addToRequestList(type, url, method, initiatorScript) {
     request = {
         "type": type,
         "method": method,
+        "body": body,
         "url": url,
         "timestamp": currentTime,
         "initiatorScript": initiatorScript
     };
 
     updateRequestList(request, currentTime);
+    updateSizeList(request);
 }
 
 function updateRequestList(request, currentTime) {
     requestList.push(request); // Add new request to list
-    requestList = requestList.filter(item => item.timestamp >= currentTime - measurementTime) // Remove old requests from list
+    requestList = requestList.filter(item => item.timestamp >= currentTime - MEASUREMENT_TIME) // Remove old requests from list
     checkListForReplayScripts();
 }
 
@@ -88,10 +99,27 @@ function checkListForReplayScripts() {
 
     // Check if script exceeds the maximum allowed counts
     for (const script in scriptCounts) {
-        if (scriptCounts[script] > maxCountsPerMeasurementTime) {
+        if (scriptCounts[script] > MAX_COUNTS_PER_MEASUREMENT_TIME) {
             SRSSet.add(script); // Add to set (duplicates will be ignored)
             updateScripts();
         }
+    }
+}
+
+let bigRequests = [];
+
+function updateSizeList(request) {
+    if (request.body) {
+        if (request.body.length > MIN_BODY_SIZE) {
+            bigRequests.push(request);
+        }
+
+        try {
+            let url = new URL(request.url);
+            if ((url.search + url.hash).length > MIN_URL_SIZE) {
+                bigRequests.push(request);
+            }
+        } catch { }
     }
 }
 
