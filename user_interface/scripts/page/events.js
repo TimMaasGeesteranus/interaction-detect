@@ -59,6 +59,7 @@ function addToScriptsWithListeners(script, type) {
         newScript["total"]++; // Increment type counter
         scriptsWithListeners.push(newScript); // Add to array
     }
+    registerInterception();
 }
 
 function getInitiatorScript() {
@@ -79,24 +80,17 @@ function getInitiatorScript() {
     }
 }
 
-//TODO send scripts with eventlisteners to popup
+function registerInterception() {
+    // Clear the previous logging interval
+    clearTimeout(interceptionTimer);
 
-// function registerInterception(call) { //Still needed?
-//     scriptsWithListeners.push(call);
+    // Send the intercepted calls after 1sec of inactivity
+    interceptionTimer = setTimeout(() => {
+        sendMessageToContentScript("addInterceptedListeners", scriptsWithListeners);
+        scriptsWithListeners = []; // Empty array
+    }, 1000);
+}
 
-//     // Clear the previous logging interval
-//     clearTimeout(interceptionTimer);
-
-//     // Send the intercepted calls after 1sec of inactivity
-//     interceptionTimer = setTimeout(() => {
-//         //sendMessageToContentScript("listenerIntercepted", interceptedEvents);
-//         console.log("EVENTS: " + scriptsWithListeners);
-//         scriptsWithListeners = [];
-//     }, 1000);
-// }
-
-// function sendMessageToContentScript(type, message) {
-//     document.dispatchEvent(
-//         new CustomEvent(type, { detail: message })
-//     )
-// }
+function sendMessageToContentScript(type, data) {
+    window.postMessage({ type, data: data });
+};

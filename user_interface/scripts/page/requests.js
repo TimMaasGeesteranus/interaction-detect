@@ -4,7 +4,8 @@ const MIN_URL_SIZE = 50;
 const MIN_BODY_SIZE = 10000;
 
 let requestList = [];
-let SRSSet = new Set();
+let SRSSet_time = new Set();
+let SRSSet_size = new Set();
 
 window.addEventListener('load', () => { // Wait for all resources to be loaded
     interceptRequests();
@@ -80,17 +81,17 @@ function addToRequestList(type, url, method, body, initiatorScript) {
         "initiatorScript": initiatorScript
     };
 
-    updateRequestList(request, currentTime);
-    updateSizeList(request);
+    updateSRS_time(request, currentTime);
+    updateSRS_size(request);
 }
 
-function updateRequestList(request, currentTime) {
+function updateSRS_time(request, currentTime) {
     requestList.push(request); // Add new request to list
     requestList = requestList.filter(item => item.timestamp >= currentTime - MEASUREMENT_TIME) // Remove old requests from list
-    checkListForReplayScripts();
+    checkIfScriptExceedsTime();
 }
 
-function checkListForReplayScripts() {
+function checkIfScriptExceedsTime() {
     // Counts occurrences of each initiatorScript in request list
     const scriptCounts = requestList.reduce((counts, item) => {
         counts[item.initiatorScript] = (counts[item.initiatorScript] || 0) + 1;
@@ -100,29 +101,29 @@ function checkListForReplayScripts() {
     // Check if script exceeds the maximum allowed counts
     for (const script in scriptCounts) {
         if (scriptCounts[script] > MAX_COUNTS_PER_MEASUREMENT_TIME) {
-            SRSSet.add(script); // Add to set (duplicates will be ignored)
-            updateScripts();
+            SRSSet_time.add(script); // Add to set (duplicates will be ignored)
+            sendMessageToContentScript("updateSRS_time", SRSSet_time);
         }
     }
 }
 
-let bigRequests = [];
-
-function updateSizeList(request) {
+function updateSRS_size(request) {
     if (request.body) {
         if (request.body.length > MIN_BODY_SIZE) {
-            bigRequests.push(request);
+            SRSSet_size.add(request);
+            sendMessageToContentScript("updateSRS_size", SRSSet_time);
         }
 
         try {
             let url = new URL(request.url);
             if ((url.search + url.hash).length > MIN_URL_SIZE) {
-                bigRequests.push(request);
+                SRSSet_size.add(request);
+                sendMessageToContentScript("updateSRS_size", SRSSet_time);
             }
         } catch { }
     }
 }
 
-function updateScripts() {
-    // TODO send scripts to popup
-}
+function sendMessageToContentScript(type, data) {
+    window.postMessage({ type, data: data });
+};
