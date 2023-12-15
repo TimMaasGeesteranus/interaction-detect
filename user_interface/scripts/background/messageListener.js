@@ -19,9 +19,10 @@ function handleMessage(message, sender, sendResponse) {
         case "updateSRS_time":
             SRSbyTime = data
             break;
+
         // From popup scripts
         case "getSRSlist":
-            console.log(getSRSlist());
+            sendResponse(getSRSlist());
             break;
     }
 }
@@ -57,11 +58,7 @@ function addToSRSwithListeners(data) {
 function getSRSlist() {
     let foundObjects = [];
 
-    SRSwithListeners.forEach(SRSobj => {
-        console.log("script: " + SRSobj.script)
-        console.log(SRSbySize.includes(SRSobj.script));
-        console.log(SRSbyTime.includes(SRSobj.script));
-
+    SRSwithListeners.forEach(SRSobj => { // Check if a script is in all three lists and push to foundObjects
         if (SRSbySize.includes(SRSobj.script) && SRSbyTime.includes(SRSobj.script)) {
             foundObjects.push(SRSobj);
         }

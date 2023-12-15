@@ -1,39 +1,47 @@
-body, h1 {
-    margin: 0;
-    padding: 0;
+body,
+h1 {
+  margin: 0;
+  padding: 0;
 }
 
 h1 {
-    font-size: 20px;
+  font-size: 20px;
 }
 
 p {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 body {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    width: 300px;
-    height: 300px;
-    font-family: "Roboto", sans-serif;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: 300px;
+  height: 300px;
+  font-family: "Roboto", sans-serif;
+}
+
+#content {
+  width: 280px;
+  overflow-wrap: break-word;
+  height: 300px;
+  overflow: auto;
 }
 
 header {
-    background-color: #354172;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background-color: #354172;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 main {
-    padding: 20px;
+  padding: 0px 10px 0px 10px;
 }
 
 footer {
-    color: #fff;
-    text-align: center;
+  color: #fff;
+  text-align: center;
 }

@@ -1,0 +1,17 @@
+.SRSlist ul {
+  list-style-type: none; /* Remove bullets */
+  padding-inline-start: 0;
+}
+
+.SRSlistTitle {
+  font-weight: bold;
+}
+
+.SRSlistText {
+  font-size: 18px;
+}
+
+.material-icons {
+  font-size: 18px !important;
+  vertical-align: middle;
+}

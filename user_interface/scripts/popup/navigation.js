@@ -3,48 +3,35 @@ const listButton = document.getElementById('listButton');
 const content = document.getElementById('content');
 
 // Load home page
-chrome.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
-    content.innerHTML = getListenerContent(response);
+chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => {
+    content.innerHTML = getSRSlistContent(response);
 })
 
-// List page
-listButton.addEventListener('click', () => {
-    // chrome.runtime.sendMessage({ type: "getScripts" }, (response) => {
-    //     content.innerHTML = getScriptsContent(response);
-    // })
-    chrome.runtime.sendMessage({ type: "getScriptsWithListeners" }, (response) => {
-        content.innerHTML = getScriptsContent(response);
-    })
-});
+function getSRSlistContent(SRSitems) {
+    let htmlOutput = '<div class="SRSlist"><ul>';
 
-// Home page
-homeButton.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: "getUserInteractions" }, (response) => {
-        content.innerHTML = getListenerContent(response);
-    })
-});
+    SRSitems.forEach(item => {
+        htmlOutput += `<li>
+        <div class="SRSlistTitle">${item.script}</div>
+        <div class="SRSlistText">
+        <span class="material-icons">format_list_numbered</span>${item.total}
+        <span class="material-icons">ads_click</span>${item.click}
+        ?${item.pointerdown}
+        <span class="material-icons">mouse</span>${item.mouseover}
+        <span class="material-icons">mouse</span>${item.mouseout}
+        <span class="material-icons">mouse</span>${item.mousedown} <br/>
+        <span class="material-icons">mouse</span>${item.mouseup}
+        ?${item.scroll}
+        ?${item.wheel}
+        <span class="material-icons">keyboard</span>${item.keydown}
+        <span class="material-icons">keyboard</span>${item.keyup}
+        <span class="material-icons">keyboard</span>${item.keypress}
+        ?${item.input}
+        </div>
+        </li><br/>`
 
-function getListenerContent(interaction) {
-    return `<div>
-    mousemove: ${interaction["mousemove"]}
-    <br>click: ${interaction["click"]}
-    <br>keypress: ${interaction["keypress"]}
-    <br>scroll: ${interaction["scroll"]}
-    <br>drag: ${interaction["drag"]}
-    <br>copy: ${interaction["copy"]}
-    <br>cut: ${interaction["cut"]}
-    <br>paste: ${interaction["paste"]}
-    </div>`;
-}
+    });
 
-function getScriptsContent(scripts) {
-    let html = '<div><ul>';
-
-    for (let i = 0; i < scripts.length; i++) {
-        html += `<li>${scripts[i]}</li>`;
-    }
-
-    html += '</ul></div>';
-
-    return html;
+    htmlOutput += '</ul></div>'
+    return htmlOutput;
 }
