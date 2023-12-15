@@ -4,7 +4,12 @@ const content = document.getElementById('content');
 
 // Load home page
 chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => {
-    content.innerHTML = getSRSlistContent(response);
+    if (response.length == 0) {
+        content.innerHTML = "<p>Nothing found yet...</p>";
+    }
+    else {
+        content.innerHTML = getSRSlistContent(response);
+    }
 })
 
 function getSRSlistContent(SRSitems) {
