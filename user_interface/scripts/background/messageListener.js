@@ -1,77 +1,71 @@
-export let extensionEnabled = true;
-let scriptsContainingListeners = [];
-let trackedUrls = [];
-let interactionCounts = {
-    mousemove: 0,
-    click: 0,
-    keypress: 0,
-    scroll: 0,
-    drag: 0,
-    copy: 0,
-    cut: 0,
-    paste: 0
-};
-let eventsArray = [];
+let SRSwithListeners = [];
+let SRSbySize = [];
+let SRSbyTime = [];
 
-// Receive messages from extension popup and background scripts
+// Receive messages from extension popup and content scripts
 chrome.runtime.onMessage.addListener(handleMessage);
 
 function handleMessage(message, sender, sendResponse) {
-    const content = message["content"];
+    const data = message.data;
 
     switch (message["type"]) {
-        case "setBadgeText":
-            chrome.browserAction.setBadgeText({ text: content });
+        // From page scripts
+        case "addInterceptedListeners":
+            addToSRSwithListeners(data);
             break;
-        case "listenerIntercepted": //from eventDetection.js
-            eventsArray = content;
-            processInterceptedListeners(content)
+        case "updateSRS_size":
+            SRSbySize = data
             break;
-        case "getUserInteractions":
-            sendResponse(interactionCounts);
+        case "updateSRS_time":
+            SRSbyTime = data
             break;
-        case "getScriptsWithListeners":
-            sendResponse(scriptsContainingListeners);
-            break;
-        case "getScripts":
-            sendResponse(trackedUrls);
-            break;
-        case "enableExtension":
-            extensionEnabled = true;
-            break;
-        case "disableExtension":
-            extensionEnabled = false;
-            resetStats();
-            break;
-        case "getExtensionEnabled":
-            sendResponse(extensionEnabled);
+        // From popup scripts
+        case "getSRSlist":
+            console.log(getSRSlist());
             break;
     }
 }
 
-export function addToTrackedUrls(url) { // gets called form interceptRequests
-    if (!trackedUrls.includes(url)) {
-        trackedUrls.push(url);
-    }
-}
+function addToSRSwithListeners(data) {
+    data.forEach(newObj => {
+        // Check if script already is in array
+        let index = SRSwithListeners.findIndex(obj => obj.script === newObj.script);
 
-function resetStats() {
-    Object.keys(interactionCounts).forEach(key => {
-        interactionCounts[key] = 0;
-    });
+        if (index !== -1) { // update existing script
+            SRSwithListeners[index].click += newObj.click;
+            SRSwithListeners[index].input += newObj.input;
+            SRSwithListeners[index].keydown += newObj.keydown;
+            SRSwithListeners[index].keypress += newObj.keypress;
+            SRSwithListeners[index].keyup += newObj.keyup;
+            SRSwithListeners[index].mousedown += newObj.mousedown;
+            SRSwithListeners[index].mousemove += newObj.mousemove;
+            SRSwithListeners[index].mouseout += newObj.mouseout;
+            SRSwithListeners[index].mouseover += newObj.mouseover;
+            SRSwithListeners[index].mouseup += newObj.mouseup;
+            SRSwithListeners[index].pointerdown += newObj.pointerdown;
+            SRSwithListeners[index].scroll += newObj.scroll;
+            SRSwithListeners[index].total += newObj.total;
+            SRSwithListeners[index].wheel += newObj.wheel;
 
-    trackedUrls = [];
-
-    // TODO reset UI screen
-}
-
-// Add each intercepted listener call to correct counters and lists
-function processInterceptedListeners(eventsArray) {
-    for (let event of eventsArray) {
-        interactionCounts[event["type"]]++;
-        if (!scriptsContainingListeners.includes(event["url"])) {
-            scriptsContainingListeners.push(event["url"]);
         }
-    }
+        else { // script does not exist yet
+            SRSwithListeners.push(newObj);
+        }
+    })
+}
 
+function getSRSlist() {
+    let foundObjects = [];
+
+    SRSwithListeners.forEach(SRSobj => {
+        console.log("script: " + SRSobj.script)
+        console.log(SRSbySize.includes(SRSobj.script));
+        console.log(SRSbyTime.includes(SRSobj.script));
+
+        if (SRSbySize.includes(SRSobj.script) && SRSbyTime.includes(SRSobj.script)) {
+            foundObjects.push(SRSobj);
+        }
+    })
+
+    return foundObjects;
 }

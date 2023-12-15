@@ -88,7 +88,7 @@ function registerInterception() {
     interceptionTimer = setTimeout(() => {
         sendMessageToContentScript("addInterceptedListeners", scriptsWithListeners);
         scriptsWithListeners = []; // Empty array
-    }, 1000);
+    }, 300);
 }
 
 function sendMessageToContentScript(type, data) {

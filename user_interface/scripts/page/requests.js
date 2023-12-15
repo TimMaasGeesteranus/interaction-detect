@@ -102,7 +102,7 @@ function checkIfScriptExceedsTime() {
     for (const script in scriptCounts) {
         if (scriptCounts[script] > MAX_COUNTS_PER_MEASUREMENT_TIME) {
             SRSSet_time.add(script); // Add to set (duplicates will be ignored)
-            sendMessageToContentScript("updateSRS_time", SRSSet_time);
+            sendMessageToContentScript("updateSRS_time", [...SRSSet_time]);
         }
     }
 }
@@ -110,15 +110,15 @@ function checkIfScriptExceedsTime() {
 function updateSRS_size(request) {
     if (request.body) {
         if (request.body.length > MIN_BODY_SIZE) {
-            SRSSet_size.add(request);
-            sendMessageToContentScript("updateSRS_size", SRSSet_time);
+            SRSSet_size.add(request.initiatorScript);
+            sendMessageToContentScript("updateSRS_size", [...SRSSet_size]);
         }
 
         try {
             let url = new URL(request.url);
             if ((url.search + url.hash).length > MIN_URL_SIZE) {
-                SRSSet_size.add(request);
-                sendMessageToContentScript("updateSRS_size", SRSSet_time);
+                SRSSet_size.add(request.initiatorScript);
+                sendMessageToContentScript("updateSRS_size", [...SRSSet_size]);
             }
         } catch { }
     }
