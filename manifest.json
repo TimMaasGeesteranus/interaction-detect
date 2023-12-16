@@ -27,7 +27,7 @@
         "<all_urls>"
       ],
       "js": [
-        "user_interface/scripts/content/eventListeners.js",
+        "user_interface/scripts/content/markInteractions.js",
         "user_interface/scripts/content/injectScript.js"
       ],
       "run_at": "document_start"

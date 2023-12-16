@@ -65,8 +65,23 @@ function findMatches() {
     SRSwithListeners.forEach(SRSobj => { // Check if a script is in all three lists and push to foundSRSs
         if (SRSbySize.includes(SRSobj.script) && SRSbyTime.includes(SRSobj.script)) {
             foundSRSs.push(SRSobj);
-            chrome.action.setBadgeBackgroundColor({color: 'red'})
-            chrome.action.setBadgeText({ text: "!" });
+            alertUserSRSFound()
         }
     })
+}
+
+function alertUserSRSFound() {
+    // Set extension badge
+    chrome.action.setBadgeBackgroundColor({ color: 'red' })
+    chrome.action.setBadgeText({ text: "!" });
+
+    // Send message to mark interactions that SRS is listening to
+    // (async () => {
+    //     const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    //     const response = await chrome.tabs.sendMessage(tab.id, { type: "SRSFound", data: foundSRSs });
+    //     // do something with response here, not outside the function
+    //     console.log(response);
+    // })();
+
+
 }
