@@ -19,22 +19,33 @@ function getSRSlistContent(SRSitems) {
         htmlOutput += `<li>
         <div class="SRSlistTitle">${item.script}</div>
         <div class="SRSlistText">
-        <span class="material-icons">format_list_numbered</span>${item.total}
-        <span class="material-icons">ads_click</span>${item.click}
-        ?${item.pointerdown}
-        <span class="material-icons">mouse</span>${item.mouseover}
-        <span class="material-icons">mouse</span>${item.mouseout}
-        <span class="material-icons">mouse</span>${item.mousedown} <br/>
-        <span class="material-icons">mouse</span>${item.mouseup}
-        ?${item.scroll}
-        ?${item.wheel}
-        <span class="material-icons">keyboard</span>${item.keydown}
-        <span class="material-icons">keyboard</span>${item.keyup}
-        <span class="material-icons">keyboard</span>${item.keypress}
-        ?${item.input}
+            <div title="total">
+                <span class="material-icons">format_list_numbered</span>${item.total}
+            </div>
+            <div title="mouseover: ${item.mouseover} mouseout: ${item.mouseout} mousedown: ${item.mousedown} mouseup: ${item.mouseup}">
+                <span class="material-icons">mouse</span>${item.mouseover + item.mouseout + item.mousedown + item.mouseup}
+            </div>
+            <div title="click: ${item.click} pointerdown: ${item.pointerdown}">
+                <span class="material-icons">ads_click</span>${item.click + item.pointerdown}
+            </div>
+            <div title="scroll: ${item.scroll} wheel: ${item.wheel}">
+                <span class="material-icons">height</span>${item.scroll + item.wheel}
+            </div>
+            <br/>
+            <div title="touchstart: ${item.touchstart} touchend: ${item.touchend} touchmove: ${item.touchmove} touchcancel: ${item.touchcancel}">
+                <span class="material-icons">touch_app</span>${item.touchstart + item.touchend + item.touchmove + item.touchcancel}
+            </div>
+            <div title="keypress: ${item.keypress} keyup: ${item.keyup} keydown: ${item.keyup}">
+                <span class="material-icons">keyboard</span>${item.keypress + item.keyup + item.keydown}
+            </div>
+            <div title="input: ${item.input} change: ${item.change}">
+                <span class="material-icons">edit_square</span>${item.input + item.change}
+            </div>
+            <div title="select">
+                <span class="material-symbols-outlined">gesture_select</span>${item.select}
+            </div>
         </div>
         </li><br/>`
-
     });
 
     htmlOutput += '</ul></div>'

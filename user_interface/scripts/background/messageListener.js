@@ -53,6 +53,12 @@ function addToSRSwithListeners(data) {
             SRSwithListeners[index].scroll += newObj.scroll;
             SRSwithListeners[index].total += newObj.total;
             SRSwithListeners[index].wheel += newObj.wheel;
+            SRSwithListeners[index].touchstart += newObj.touchstart;
+            SRSwithListeners[index].touchend += newObj.touchend;
+            SRSwithListeners[index].touchmove += newObj.touchmove;
+            SRSwithListeners[index].touchcancel += newObj.touchcancel;
+            SRSwithListeners[index].change += newObj.change;
+            SRSwithListeners[index].select += newObj.select;
         }
         else { // script does not exist yet
             SRSwithListeners.push(newObj);

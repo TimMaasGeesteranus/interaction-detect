@@ -1,5 +1,5 @@
 const MAX_INTERCEPTION_COUNT = 200;
-const typesToInclude = ["click", "pointerdown", "mousemove", "mouseover", "mouseout", "mousedown", "mouseup", "scroll", "wheel", "keydown", "keyup", "keypress", "input"];
+const typesToInclude = ["select", "change", "touchstart", "touchend", "touchmove", "touchcancel", "click", "pointerdown", "mousemove", "mouseover", "mouseout", "mousedown", "mouseup", "scroll", "wheel", "keydown", "keyup", "keypress", "input"];
 let scriptsWithListeners = [];
 let interceptionTimer;
 
@@ -54,6 +54,12 @@ function addToScriptsWithListeners(script, type) {
             "keyup": 0,
             "keypress": 0,
             "input": 0,
+            "touchstart": 0,
+            "touchend": 0,
+            "touchmove": 0,
+            "touchcancel": 0,
+            "change": 0,
+            "select": 0
         }
         newScript[type]++; // Increment total counter
         newScript["total"]++; // Increment type counter
