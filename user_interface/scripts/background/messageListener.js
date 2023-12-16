@@ -2,6 +2,8 @@ let SRSwithListeners = [];
 let SRSbySize = [];
 let SRSbyTime = [];
 
+let foundSRSs = [];
+
 // Receive messages from extension popup and content scripts
 chrome.runtime.onMessage.addListener(handleMessage);
 
@@ -12,17 +14,21 @@ function handleMessage(message, sender, sendResponse) {
         // From page scripts
         case "addInterceptedListeners":
             addToSRSwithListeners(data);
+            findMatches();
             break;
         case "updateSRS_size":
-            SRSbySize = data
+            SRSbySize = data;
+            findMatches();
             break;
         case "updateSRS_time":
-            SRSbyTime = data
+            SRSbyTime = data;
+            findMatches();
             break;
 
         // From popup scripts
         case "getSRSlist":
-            sendResponse(getSRSlist());
+            sendResponse(foundSRSs);
+            chrome.action.setBadgeText({ text: null });
             break;
     }
 }
@@ -47,7 +53,6 @@ function addToSRSwithListeners(data) {
             SRSwithListeners[index].scroll += newObj.scroll;
             SRSwithListeners[index].total += newObj.total;
             SRSwithListeners[index].wheel += newObj.wheel;
-
         }
         else { // script does not exist yet
             SRSwithListeners.push(newObj);
@@ -55,14 +60,13 @@ function addToSRSwithListeners(data) {
     })
 }
 
-function getSRSlist() {
-    let foundObjects = [];
-
-    SRSwithListeners.forEach(SRSobj => { // Check if a script is in all three lists and push to foundObjects
+function findMatches() {
+    foundSRSs = [];
+    SRSwithListeners.forEach(SRSobj => { // Check if a script is in all three lists and push to foundSRSs
         if (SRSbySize.includes(SRSobj.script) && SRSbyTime.includes(SRSobj.script)) {
-            foundObjects.push(SRSobj);
+            foundSRSs.push(SRSobj);
+            chrome.action.setBadgeBackgroundColor({color: 'red'})
+            chrome.action.setBadgeText({ text: "!" });
         }
     })
-
-    return foundObjects;
 }
