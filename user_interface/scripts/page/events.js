@@ -1,4 +1,3 @@
-const MAX_INTERCEPTION_COUNT = 200;
 const typesToInclude = ["select", "change", "touchstart", "touchend", "touchmove", "touchcancel", "click", "pointerdown", "mousemove", "mouseover", "mouseout", "mousedown", "mouseup", "scroll", "wheel", "keydown", "keyup", "keypress", "input"];
 let scriptsWithListeners = [];
 let interceptionTimer;
@@ -15,7 +14,7 @@ function interceptEventListener() {
 
             const initiatorScript = getInitiatorScript(); // Get script that evenListener is located in
 
-            origFunc.call(this, type, function (...args) {
+            origFunc.call(this, type, function (...args) { // Add our logic to original function
                 if (typesToInclude.includes(type)) {
                     if (initiatorScript != undefined) {
                         addToScriptsWithListeners(initiatorScript, type);
@@ -23,7 +22,7 @@ function interceptEventListener() {
                 }
 
                 if (fn != undefined) {
-                    return fn.apply(this, args);
+                    return fn.apply(this, args); // Execute original function
                 }
             }, ...rest);
         }
