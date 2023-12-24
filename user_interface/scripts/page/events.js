@@ -13,14 +13,15 @@ function interceptEventListener() {
     Object.defineProperty(EventTarget.prototype, "addEventListener", {
         value: function (type, fn, ...rest) {
 
-            if (typesToInclude.includes(type)) {
-                const initiatorScript = getInitiatorScript(); // Get script that evenListener is located in
-                if (initiatorScript != undefined) {
-                    addToScriptsWithListeners(initiatorScript, type);
-                }
-            }
+            const initiatorScript = getInitiatorScript(); // Get script that evenListener is located in
 
             origFunc.call(this, type, function (...args) {
+                if (typesToInclude.includes(type)) {
+                    if (initiatorScript != undefined) {
+                        addToScriptsWithListeners(initiatorScript, type);
+                    }
+                }
+
                 if (fn != undefined) {
                     return fn.apply(this, args);
                 }
