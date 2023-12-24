@@ -28,7 +28,6 @@ function handleMessage(message, sender, sendResponse) {
         // From popup scripts
         case "getSRSlist":
             sendResponse(foundSRSs);
-            chrome.action.setBadgeText({ text: null });
             break;
     }
 }
@@ -67,11 +66,13 @@ function addToSRSwithListeners(data) {
 }
 
 function findMatches() {
-    foundSRSs = [];
+    //foundSRSs = [];
     SRSwithListeners.forEach(SRSobj => { // Check if a script is in all three lists and push to foundSRSs
         if (SRSbySize.includes(SRSobj.script) && SRSbyTime.includes(SRSobj.script)) {
-            foundSRSs.push(SRSobj);
-            alertUserSRSFound()
+            if (!foundSRSs.includes(SRSobj)) {
+                foundSRSs.push(SRSobj);
+                alertUserSRSFound()
+            }
         }
     })
 }
