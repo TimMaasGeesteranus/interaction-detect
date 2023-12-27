@@ -1,16 +1,28 @@
-const homeButton = document.getElementById('homeButton');
-const listButton = document.getElementById('listButton');
+const currentPageButton = document.getElementById('currentPageButton');
+const allPagesButton = document.getElementById('allPagesButton');
 const content = document.getElementById('content');
 
 // Load home page
-chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => {
-    if (response.length == 0) {
-        content.innerHTML = "<p>Nothing found yet...</p>";
-    }
-    else {
-        content.innerHTML = getSRSlistContent(response);
-    }
-})
+loadCurrentPage();
+
+// Listen for button clicks
+allPagesButton.addEventListener('click', () => loadAllPages());
+currentPageButton.addEventListener('click', () => loadCurrentPage());
+
+function loadCurrentPage(){
+    content.innerHTML = "<p>Much empty</p>";
+}
+
+function loadAllPages() {
+    chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => {
+        if (response.length == 0) {
+            content.innerHTML = "<p>Nothing found yet...</p>";
+        }
+        else {
+            content.innerHTML = getSRSlistContent(response);
+        }
+    })
+}
 
 function getSRSlistContent(SRSitems) {
     let htmlOutput = '<div class="SRSlist"><ul>';
