@@ -2,6 +2,17 @@ let SRSwithEvents = [];
 let SRSbySize = [];
 let SRSbyTime = [];
 let foundSRSs = [];
+let host;
+
+// Listen for tab activation events
+chrome.tabs.onActivated.addListener((activeInfo) => {
+    // Get the details of the active tab
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+        const tabUrl = new URL(tab.url);
+        host = tabUrl.host;
+    });
+});
+
 
 // Receive messages from extension popup and content scripts
 chrome.runtime.onMessage.addListener(handleMessage);
@@ -27,6 +38,9 @@ function handleMessage(message, sender, sendResponse) {
         // From popup scripts
         case "getSRSlist":
             sendResponse(foundSRSs);
+            break;
+        case "getCurrentPage":
+            sendResponse(host);
             break;
     }
 }
