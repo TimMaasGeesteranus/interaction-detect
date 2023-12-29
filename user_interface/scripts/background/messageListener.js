@@ -16,11 +16,11 @@ function handleMessage(message, sender, sendResponse) {
             findMatches();
             break;
         case "updateSRS_size": // requests
-            addToSRSbySize(data);
+            addToSRSArray(data, SRSbySize);
             findMatches();
             break;
         case "updateSRS_time": // requests
-            addToSRSbyTime(data);
+            addToSRSArray(data, SRSbyTime);
             findMatches();
             break;
 
@@ -64,28 +64,12 @@ function addToSRSwithEvents(data) {
     })
 }
 
-function addToSRSbySize(newObj) {
+function addToSRSArray(newObj, SRSArray) {
     // Check if pageUrl is already in list
-    let index = SRSbySize.findIndex(obj => obj.pageUrl === newObj.pageUrl);
+    let index = SRSArray.findIndex(obj => obj.pageUrl === newObj.pageUrl);
 
-    if (index !== -1) { // update existing page scripts
-        SRSbySize[index].SRSSet = newObj.SRSSet;
-    }
-    else { // add new page scripts
-        SRSbySize.push(newObj)
-    }
-}
-
-function addToSRSbyTime(newObj) {
-    // Check if pageUrl is already in list
-    let index = SRSbyTime.findIndex(obj => obj.pageUrl === newObj.pageUrl);
-
-    if (index !== -1) { // update existing page scripts
-        SRSbyTime[index].SRSSet = newObj.SRSSet;
-    }
-    else { // add new page scripts
-        SRSbyTime.push(newObj)
-    }
+    // Update existing page scripts or add new page scripts
+    index !== -1 ? Object.assign(SRSArray[index], newObj) : SRSArray.push(newObj);
 }
 
 function findMatches() {
