@@ -11,20 +11,9 @@ currentPageButton.addEventListener('click', () => loadCurrentPage());
 
 function loadCurrentPage() {
     chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => { // Get all scripts
-        if (response.length == 0) {
-            content.innerHTML = "<p>Nothing found yet...</p>";
-            return;
-        }
-        else {
-            chrome.runtime.sendMessage({ type: "getCurrentPage" }, (currentPage) => { // Get current page url
-                let pageHasScripts = Object.values(response).some(obj => obj.pageurl === currentPage); // Check if current page has scripts
-                if (!pageHasScripts) {
-                    content.innerHTML = "<p>Nothing found yet...</p>";
-                    return;
-                }
-                content.innerHTML = getCurrentPageContent(response, currentPage); // Display scripts on current page
-            })
-        }
+        chrome.runtime.sendMessage({ type: "getCurrentPage" }, (currentPage) => { // Get current page url
+            content.innerHTML = getCurrentPageContent(response, currentPage); // Display scripts on current page
+        })
     })
 }
 
@@ -69,8 +58,15 @@ function getSRSlistContent(SRSitems) {
 
 function getCurrentPageContent(SRSitems, currentPage) {
     let htmlOutput = '<div class="SRSlist"><ul>';
+    htmlOutput += `<div class="SRSlistPageUrl">${currentPage}</div>`; // Show current page url
 
-    SRSitems.forEach(item => {
+    // Check if current page has scripts
+    if (SRSitems.length == 0 || !Object.values(SRSitems).some(obj => obj.pageurl === currentPage)) {
+        htmlOutput += "<p>Nothing found on this page...</p></ul></div>";
+        return htmlOutput;
+    }
+
+    SRSitems.forEach(item => { // Display scripts
         console.log(item.pageurl + " - " + currentPage);
         if (item.pageurl === currentPage) {
             htmlOutput += getItemHTML(item);

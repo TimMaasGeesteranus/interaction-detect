@@ -4,16 +4,6 @@ let SRSbyTime = [];
 let foundSRSs = [];
 let host;
 
-// Listen for tab activation events
-chrome.tabs.onActivated.addListener((activeInfo) => {
-    // Get the details of the active tab
-    chrome.tabs.get(activeInfo.tabId, (tab) => {
-        const tabUrl = new URL(tab.url);
-        host = tabUrl.host;
-    });
-});
-
-
 // Receive messages from extension popup and content scripts
 chrome.runtime.onMessage.addListener(handleMessage);
 
@@ -118,3 +108,23 @@ function alertUserSRSFound() {
 
 
 }
+
+// Listen for tab activation events
+chrome.tabs.onActivated.addListener((activeInfo) => {
+    // Get the details of the active tab
+    chrome.tabs.get(activeInfo.tabId, (tab) => {
+        if (tab.url !== "") {
+            const tabUrl = new URL(tab.url);
+            host = tabUrl.host; // update host
+        }
+    });
+});
+
+// Listen for changes in the URL of the currently active tab
+chrome.webNavigation.onCompleted.addListener((details) => {
+    // Check if the navigation is in the main frame
+    if (details.frameId === 0 && details.url) {
+        const tabUrl = new URL(details.url);
+        host = tabUrl.host; // update host
+    }
+});
