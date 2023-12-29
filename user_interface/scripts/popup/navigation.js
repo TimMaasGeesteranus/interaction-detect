@@ -10,6 +10,9 @@ allPagesButton.addEventListener('click', () => loadAllPages());
 currentPageButton.addEventListener('click', () => loadCurrentPage());
 
 function loadCurrentPage() {
+    currentPageButton.classList.add('selected');
+    allPagesButton.classList.remove('selected');
+
     chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => { // Get all scripts
         chrome.runtime.sendMessage({ type: "getCurrentPage" }, (currentPage) => { // Get current page url
             content.innerHTML = getCurrentPageContent(response, currentPage); // Display scripts on current page
@@ -18,6 +21,9 @@ function loadCurrentPage() {
 }
 
 function loadAllPages() {
+    allPagesButton.classList.add('selected');
+    currentPageButton.classList.remove('selected');
+
     chrome.runtime.sendMessage({ type: "getSRSlist" }, (response) => { // Get all scripts
         if (response.length == 0) { // Check if list is empty
             content.innerHTML = "<p>Nothing found yet...</p>";

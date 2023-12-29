@@ -17,6 +17,10 @@
     background-color: #576d96;
 }
 
+.nav-item.selected {
+    text-decoration: underline;
+}
+
 .nav-item:first-child {
     border-left: none;
 }
