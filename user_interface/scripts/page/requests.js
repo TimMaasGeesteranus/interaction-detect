@@ -1,5 +1,5 @@
 const MEASUREMENT_TIME = 60000 // a minute
-const MAX_COUNTS_PER_MEASUREMENT_TIME = 5;
+const MAX_COUNTS_PER_MEASUREMENT_TIME = 2;
 const MIN_URL_SIZE = 50;
 const MIN_BODY_SIZE = 10000;
 
@@ -102,7 +102,7 @@ function checkIfScriptExceedsTime() {
     for (const script in scriptCounts) {
         if (scriptCounts[script] > MAX_COUNTS_PER_MEASUREMENT_TIME) {
             SRSSet_time.add(script); // Add to set (duplicates will be ignored)
-            sendMessageToContentScript("updateSRS_time", [...SRSSet_time]);
+            sendEventsRequestMessageToContentScript("updateSRS_time", [...SRSSet_time]);
         }
     }
 }
@@ -111,19 +111,20 @@ function updateSRS_size(request) {
     if (request.body) {
         if (request.body.length > MIN_BODY_SIZE) {
             SRSSet_size.add(request.initiatorScript);
-            sendMessageToContentScript("updateSRS_size", [...SRSSet_size]);
+            sendEventsRequestMessageToContentScript("updateSRS_size", [...SRSSet_size]);
         }
 
         try {
             let url = new URL(request.url);
             if ((url.search + url.hash).length > MIN_URL_SIZE) {
                 SRSSet_size.add(request.initiatorScript);
-                sendMessageToContentScript("updateSRS_size", [...SRSSet_size]);
+                sendEventsRequestMessageToContentScript("updateSRS_size", [...SRSSet_size]);
             }
         } catch { }
     }
 }
 
-function sendMessageToContentScript(type, data) {
+function sendEventsRequestMessageToContentScript(type, SRSSet) {
+    const data = { "SRSSet": SRSSet, "pageUrl": window.location.host }
     window.postMessage({ type, data: data });
 };

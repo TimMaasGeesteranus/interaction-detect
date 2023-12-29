@@ -1,7 +1,6 @@
-let SRSwithListeners = [];
+let SRSwithEvents = [];
 let SRSbySize = [];
 let SRSbyTime = [];
-
 let foundSRSs = [];
 
 // Receive messages from extension popup and content scripts
@@ -12,16 +11,16 @@ function handleMessage(message, sender, sendResponse) {
 
     switch (message["type"]) {
         // From page scripts
-        case "addInterceptedListeners":
-            addToSRSwithListeners(data);
+        case "addInterceptedListeners": // events
+            addToSRSwithEvents(data);
             findMatches();
             break;
-        case "updateSRS_size":
-            SRSbySize = data;
+        case "updateSRS_size": // requests
+            addToSRSbySize(data);
             findMatches();
             break;
-        case "updateSRS_time":
-            SRSbyTime = data;
+        case "updateSRS_time": // requests
+            addToSRSbyTime(data);
             findMatches();
             break;
 
@@ -32,50 +31,79 @@ function handleMessage(message, sender, sendResponse) {
     }
 }
 
-function addToSRSwithListeners(data) {
+function addToSRSwithEvents(data) {
     data.forEach(newObj => {
         // Check if script already is in array
-        let index = SRSwithListeners.findIndex(obj => obj.script === newObj.script);
+        let index = SRSwithEvents.findIndex(obj => obj.script === newObj.script);
 
         if (index !== -1) { // update existing script
-            SRSwithListeners[index].click += newObj.click;
-            SRSwithListeners[index].input += newObj.input;
-            SRSwithListeners[index].keydown += newObj.keydown;
-            SRSwithListeners[index].keypress += newObj.keypress;
-            SRSwithListeners[index].keyup += newObj.keyup;
-            SRSwithListeners[index].mousedown += newObj.mousedown;
-            SRSwithListeners[index].mousemove += newObj.mousemove;
-            SRSwithListeners[index].mouseout += newObj.mouseout;
-            SRSwithListeners[index].mouseover += newObj.mouseover;
-            SRSwithListeners[index].mouseup += newObj.mouseup;
-            SRSwithListeners[index].pointerdown += newObj.pointerdown;
-            SRSwithListeners[index].scroll += newObj.scroll;
-            SRSwithListeners[index].total += newObj.total;
-            SRSwithListeners[index].wheel += newObj.wheel;
-            SRSwithListeners[index].touchstart += newObj.touchstart;
-            SRSwithListeners[index].touchend += newObj.touchend;
-            SRSwithListeners[index].touchmove += newObj.touchmove;
-            SRSwithListeners[index].touchcancel += newObj.touchcancel;
-            SRSwithListeners[index].change += newObj.change;
-            SRSwithListeners[index].select += newObj.select;
+            SRSwithEvents[index].click += newObj.click;
+            SRSwithEvents[index].input += newObj.input;
+            SRSwithEvents[index].keydown += newObj.keydown;
+            SRSwithEvents[index].keypress += newObj.keypress;
+            SRSwithEvents[index].keyup += newObj.keyup;
+            SRSwithEvents[index].mousedown += newObj.mousedown;
+            SRSwithEvents[index].mousemove += newObj.mousemove;
+            SRSwithEvents[index].mouseout += newObj.mouseout;
+            SRSwithEvents[index].mouseover += newObj.mouseover;
+            SRSwithEvents[index].mouseup += newObj.mouseup;
+            SRSwithEvents[index].pointerdown += newObj.pointerdown;
+            SRSwithEvents[index].scroll += newObj.scroll;
+            SRSwithEvents[index].total += newObj.total;
+            SRSwithEvents[index].wheel += newObj.wheel;
+            SRSwithEvents[index].touchstart += newObj.touchstart;
+            SRSwithEvents[index].touchend += newObj.touchend;
+            SRSwithEvents[index].touchmove += newObj.touchmove;
+            SRSwithEvents[index].touchcancel += newObj.touchcancel;
+            SRSwithEvents[index].change += newObj.change;
+            SRSwithEvents[index].select += newObj.select;
         }
         else { // script does not exist yet
-            SRSwithListeners.push(newObj);
+            SRSwithEvents.push(newObj);
         }
     })
+}
+
+function addToSRSbySize(newObj) {
+    // Check if pageUrl is already in list
+    let index = SRSbySize.findIndex(obj => obj.pageUrl === newObj.pageUrl);
+
+    if (index !== -1) { // update existing page scripts
+        SRSbySize[index].SRSSet = newObj.SRSSet;
+    }
+    else { // add new page scripts
+        SRSbySize.push(newObj)
+    }
+}
+
+function addToSRSbyTime(newObj) {
+    // Check if pageUrl is already in list
+    let index = SRSbyTime.findIndex(obj => obj.pageUrl === newObj.pageUrl);
+
+    if (index !== -1) { // update existing page scripts
+        SRSbyTime[index].SRSSet = newObj.SRSSet;
+    }
+    else { // add new page scripts
+        SRSbyTime.push(newObj)
+    }
 }
 
 function findMatches() {
-    //foundSRSs = [];
-    SRSwithListeners.forEach(SRSobj => { // Check if a script is in all three lists and push to foundSRSs
-        if (SRSbySize.includes(SRSobj.script) && SRSbyTime.includes(SRSobj.script)) {
-            if (!foundSRSs.includes(SRSobj)) {
-                foundSRSs.push(SRSobj);
-                alertUserSRSFound()
-            }
+    SRSwithEvents.forEach(SRSobj => {
+        if (!foundSRSs.includes(SRSobj) && hasMatch(SRSobj)) { // Check if in all three lists and not found yet
+            foundSRSs.push(SRSobj); //save script in foundSRSs
+            alertUserSRSFound()
         }
-    })
+    });
+
+    function hasMatch(SRSobj) {
+        const matchInSRSbySize = Object.values(SRSbySize).some(obj => obj.pageUrl === SRSobj.pageurl && obj.SRSSet.includes(SRSobj.script));
+        const matchInSRSbyTime = Object.values(SRSbyTime).some(obj => obj.pageUrl === SRSobj.pageurl && obj.SRSSet.includes(SRSobj.script));
+        return matchInSRSbySize && matchInSRSbyTime;
+    }
 }
+
+
 
 function alertUserSRSFound() {
     // Set extension badge

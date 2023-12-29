@@ -40,6 +40,7 @@ function addToScriptsWithListeners(script, type) {
     else {
         let newScript = {
             "script": script,
+            "pageurl": window.location.host,
             "total": 0,
             "click": 0,
             "pointerdown": 0,
@@ -92,11 +93,11 @@ function registerInterception() {
 
     // Send the intercepted calls after 1sec of inactivity
     interceptionTimer = setTimeout(() => {
-        sendMessageToContentScript("addInterceptedListeners", scriptsWithListeners);
+        sendToContentScript("addInterceptedListeners", scriptsWithListeners);
         scriptsWithListeners = []; // Empty array
     }, 300);
 }
 
-function sendMessageToContentScript(type, data) {
+function sendToContentScript(type, data) {
     window.postMessage({ type, data: data });
 };
