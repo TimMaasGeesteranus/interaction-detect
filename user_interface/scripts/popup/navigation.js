@@ -109,7 +109,7 @@ function getItemHTML(item) {
                 <span class="material-icons">touch_app</span>${item.touchstart + item.touchend + item.touchmove + item.touchcancel}
             </div>
             <br/>
-            <div title="keypress: ${item.keypress} keyup: ${item.keyup} keydown: ${item.keyup}">
+            <div title="keypress: ${item.keypress} keyup: ${item.keyup} keydown: ${item.keydown}">
                 <span class="material-icons">keyboard</span>${item.keypress + item.keyup + item.keydown}
             </div>
             <div title="input: ${item.input} change: ${item.change}">
