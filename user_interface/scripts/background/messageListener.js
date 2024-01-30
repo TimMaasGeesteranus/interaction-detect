@@ -2,6 +2,7 @@ let SRSwithEvents = [];
 let SRSbySize = [];
 let SRSbyTime = [];
 let foundSRSs = [];
+let turnedOffDomains = [];
 let host;
 
 // Receive messages from extension popup and content scripts
@@ -15,6 +16,9 @@ function handleMessage(message, sender, sendResponse) {
         case "addInterceptedListeners": // events
             addToSRSwithEvents(data);
             findMatches();
+            break;
+        case "slowPageAlert":
+            addToTurnedOffDomains(data);
             break;
         case "updateSRS_size": // requests
             addToSRSArray(data, SRSbySize);
@@ -32,6 +36,17 @@ function handleMessage(message, sender, sendResponse) {
         case "getCurrentPage":
             sendResponse(host);
             break;
+
+        // From content scripts
+        case "getTurnedOffDomains":
+            sendResponse(turnedOffDomains);
+            break;
+    }
+}
+
+function addToTurnedOffDomains(domain) {
+    if (!turnedOffDomains.includes(domain)) {
+        turnedOffDomains.push(domain);
     }
 }
 

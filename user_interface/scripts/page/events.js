@@ -1,6 +1,15 @@
 const typesToInclude = ["select", "change", "touchstart", "touchend", "touchmove", "touchcancel", "click", "pointerdown", "mousemove", "mouseover", "mouseout", "mousedown", "mouseup", "scroll", "wheel", "keydown", "keyup", "keypress", "input"];
+const maxEventsPerSecond = 500;
+let eventsPerSecond = 0;
 let scriptsWithListeners = [];
 let interceptionTimer;
+
+setInterval(() => { // Check for amount of events per second and give alert when number is high
+    if (eventsPerSecond > maxEventsPerSecond) {
+        sendToContentScript("slowPageAlert", window.location.origin)
+    }
+    eventsPerSecond = 0;
+}, 1000);
 
 interceptEventListener();
 
@@ -11,7 +20,7 @@ function interceptEventListener() {
     // Override the addEventListener method
     Object.defineProperty(EventTarget.prototype, "addEventListener", {
         value: function (type, fn, ...rest) {
-
+            eventsPerSecond++
             const initiatorScript = getInitiatorScript(); // Get script that evenListener is located in
 
             origFunc.call(this, type, function (...args) { // Add our logic to original function
